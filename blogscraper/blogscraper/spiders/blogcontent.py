@@ -6,7 +6,7 @@ from scrapy.linkextractors import LinkExtractor
 class BlogContent(scrapy.Spider):
     name = "url_content_scraper"
 
-    # start_urls = ['']
+    # start_urls = ['https://chenhuijing.com/']
 
     def parse(self, response: Response):
         link_extractor = LinkExtractor(allow=('/blog/',))

@@ -1,0 +1,110 @@
+https://docs.aws.amazon.com/lambda/latest/dg/python-image.html
+https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html#permissions-executionrole-api
+
+FROM public.ecr.aws/lambda/python:3.12
+
+# Copy requirements.txt
+COPY requirements.txt ${LAMBDA_TASK_ROOT}
+
+# Install the specified packages
+RUN pip install -r requirements.txt
+
+# Copy function code
+COPY lambda_function.py ${LAMBDA_TASK_ROOT}
+
+# Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
+CMD [ "lambda_function.handler" ]
+
+
+docker build --platform linux/amd64 -t blog-scraper:test .
+
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 767398067034.dkr.ecr.us-east-1.amazonaws.com
+
+aws ecr create-repository --repository-name blog-scraper-project --region us-east-1 --image-scanning-configuration scanOnPush=true --image-tag-mutability MUTABLE
+
+{
+    "repository": {
+        "repositoryArn": "arn:aws:ecr:us-east-1:767398067034:repository/blog-scraper-project",
+        "registryId": "767398067034",
+        "repositoryName": "blog-scraper-project",
+        "repositoryUri": "767398067034.dkr.ecr.us-east-1.amazonaws.com/blog-scraper-project",
+        "createdAt": "2024-10-20T01:36:01.848000+01:00",
+        "imageTagMutability": "MUTABLE",
+        "imageScanningConfiguration": {
+            "scanOnPush": true
+        },
+        "encryptionConfiguration": {
+            "encryptionType": "AES256"
+        }
+    }
+}
+
+docker tag blog-scraper:test 767398067034.dkr.ecr.us-east-1.amazonaws.com/blog-scraper-project:latest
+
+docker push 767398067034.dkr.ecr.us-east-1.amazonaws.com/blog-scraper-project:latest
+
+{
+    "Role": {
+        "Path": "/",
+        "RoleName": "lambda-ex",
+        "RoleId": "AROA3FLD5HNNHLT2I25YP",
+        "Arn": "arn:aws:iam::767398067034:role/lambda-ex",
+        "CreateDate": "2024-10-20T00:47:45+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "lambda.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        }
+    }
+}
+
+aws lambda create-function \
+  --function-name scraper-lambda \
+  --package-type Image \
+  --code ImageUri=767398067034.dkr.ecr.us-east-1.amazonaws.com/blog-scraper-project:latest \
+  --role arn:aws:iam::767398067034:role/lambda-ex \
+  --region us-east-1
+
+{
+    "FunctionName": "scraper-lambda",
+    "FunctionArn": "arn:aws:lambda:us-east-1:767398067034:function:scraper-lambda",
+    "Role": "arn:aws:iam::767398067034:role/lambda-ex",
+    "CodeSize": 0,
+    "Description": "",
+    "Timeout": 3,
+    "MemorySize": 128,
+    "LastModified": "2024-10-20T00:58:23.313+0000",
+    "CodeSha256": "916edf5e1ad09729005ef4de50fe4699cc02a6c9f94a77937dd5d8be6b90b15b",
+    "Version": "$LATEST",
+    "TracingConfig": {
+        "Mode": "PassThrough"
+    },
+    "RevisionId": "af56f9cb-893b-4fe3-bacd-e01a18018d00",
+    "State": "Pending",
+    "StateReason": "The function is being created.",
+    "StateReasonCode": "Creating",
+    "PackageType": "Image",
+    "Architectures": [
+        "x86_64"
+    ],
+    "EphemeralStorage": {
+        "Size": 512
+    },
+    "SnapStart": {
+        "ApplyOn": "None",
+        "OptimizationStatus": "Off"
+    },
+    "LoggingConfig": {
+        "LogFormat": "Text",
+        "LogGroup": "/aws/lambda/scraper-lambda"
+    }
+}
+
+aws lambda invoke --function-name scraper-lambda --region us-east-1 response.json

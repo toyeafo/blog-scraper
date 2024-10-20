@@ -6,8 +6,9 @@ from blogscraper.spiders.blogcontent import BlogContent
 s3 = boto3.client('s3')
 
 def lambda_handler(event, context):
-    body = json.loads(event['body'])
-    start_url = body.get('start_url')
+    # body = json.loads(event['body'])
+    # start_url = body.get('start_url')
+    start_url = event.get('url', 'https://support.funraisin.co/')
 
     if not start_url:
         return {
@@ -29,15 +30,15 @@ def lambda_handler(event, context):
     process.start()
 
     s3.put_object(
-        Bucket='scrapedurlresult/urlscraped',
-        Key=f'{start_url.replace("https://", "").replace("/", "_")}_scraped_url.json',
+        Bucket='scrapedurlresult',
+        Key=f'{start_url.replace("https://", "").replace("/", "_")}_scraped_blog.json',
         Body=json.dumps(results)
     )
 
     return {
         'statusCode': 200,
         'headers': {
-            'COntent-Type': 'text/html'
+            'Content-Type': 'text/html'
         },
         'body': f'<p>Submitted submitted URL: {start_url} for scraping.</p>'
     }
