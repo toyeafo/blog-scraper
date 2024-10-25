@@ -108,3 +108,40 @@ aws lambda create-function \
 }
 
 aws lambda invoke --function-name scraper-lambda --region us-east-1 response.json
+
+aws lambda update-function-code   --function-name scraper-lambda   --image-uri 767398067034.dkr.ecr.us-east-1.amazonaws.com/blog-scraper-project:latest --region us-east-1  --publish
+
+{
+    "FunctionName": "scraper-lambda",
+    "FunctionArn": "arn:aws:lambda:us-east-1:767398067034:function:scraper-lambda:2",
+    "Role": "arn:aws:iam::767398067034:role/lambda-ex",
+    "CodeSize": 0,
+    "Description": "",
+    "Timeout": 3,
+    "MemorySize": 128,
+    "LastModified": "2024-10-25T12:40:14.000+0000",
+    "CodeSha256": "520c854d0b9555ad9e6322a880a585e6deecdf13b02cc6fa362f8b825c49fb63",
+    "Version": "2",
+    "TracingConfig": {
+        "Mode": "PassThrough"
+    },
+    "RevisionId": "ba9740f0-7952-44c2-bcf6-bf70bce2391c",
+    "State": "Pending",
+    "StateReason": "The function is being created.",
+    "StateReasonCode": "Creating",
+    "PackageType": "Image",
+    "Architectures": [
+        "x86_64"
+    ],
+    "EphemeralStorage": {
+        "Size": 512
+    },
+    "SnapStart": {
+        "ApplyOn": "None",
+        "OptimizationStatus": "Off"
+    },
+    "LoggingConfig": {
+        "LogFormat": "Text",
+        "LogGroup": "/aws/lambda/scraper-lambda"
+    }
+}
