@@ -30,7 +30,7 @@ jobs:
                 ls -R ./URLScraperForm/
             - name: "Copy files to S3 bucket"
               run: | 
-                aws s3 sync ./URLScraperForm/ s3://${{env.BUCKET_NAME}}/ || echo "Error copying files to s3"
+                aws s3 sync ./URLScraperForm/ s3://${{env.BUCKET_NAME}}
             # - name: "Debug: List files in s3 bucket"
             #   run: |
             #     aws s3 ls s3://${{env.BUCKET_NAME}}/
