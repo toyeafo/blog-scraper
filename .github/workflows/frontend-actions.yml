@@ -30,4 +30,4 @@ jobs:
                 ls -R ./URLScraperForm/
             - name: "Copy files to S3 bucket"
               run: | 
-                aws s3 copy ./URLScraperForm/ s3://${{env.BUCKET_NAME}}/ --recursive --exclude ".git"
+                aws s3 cp ./URLScraperForm/ s3://${{env.BUCKET_NAME}}/ --recursive --exclude ".git"
