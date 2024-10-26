@@ -1,5 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class BlogContentScraper:
     def __init__(self, start_url):
@@ -11,7 +15,7 @@ class BlogContentScraper:
             response.raise_for_status() 
             return response.content
         except requests.RequestException as e:
-            print(f"Failed to retrieve {url}: {e}")
+            logger.error(f"Failed to retrieve {url}: {e}")
             return None
 
     def parse(self, url):
@@ -33,9 +37,10 @@ class BlogContentScraper:
         if next_page:
             next_page_url = next_page['href']
             absolute_next_page = next_page_url if next_page_url.startswith('http') else self.start_url + next_page_url
+            logger.info(f"Following next page: {absolute_next_page}")
             yield from self.parse(absolute_next_page)
         else:
-            print("No additional blog pages found to follow.")
+            logger.info("No additional blog pages found to follow.")
 
     def parse_blog(self, post_url):
         page_content = self.fetch_page(post_url)
@@ -60,8 +65,3 @@ class BlogContentScraper:
             'title': title,
             'post': body_text
         }
-
-# if __name__ == '__main__':
-#     start_url = 'https://support.funraisin.co/'
-#     scraper = BlogContentScraper(start_url)
-#     scraper.parse(start_url)
