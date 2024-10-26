@@ -31,6 +31,3 @@ jobs:
             - name: "Copy files to S3 bucket"
               run: | 
                 aws s3 sync ./URLScraperForm/ s3://${{env.BUCKET_NAME}}
-            # - name: "Debug: List files in s3 bucket"
-            #   run: |
-            #     aws s3 ls s3://${{env.BUCKET_NAME}}/
