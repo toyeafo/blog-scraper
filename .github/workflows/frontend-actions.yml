@@ -31,3 +31,6 @@ jobs:
             - name: "Copy files to S3 bucket"
               run: | 
                 aws s3 cp ./URLScraperForm/ s3://${{env.BUCKET_NAME}}/ --recursive --exclude ".git"
+            - name: "Invalidate CLoudfront files"
+              run: |
+                aws create-invalidation --distribution-id E3AESCOXUQZFRJ --paths "/index.html"

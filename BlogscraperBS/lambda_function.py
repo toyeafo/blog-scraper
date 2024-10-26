@@ -70,11 +70,12 @@ def lambda_handler(event, context):
 
 def save_bucket_loc_to_dynamodb(url, s3_key, results, bucket_file_name):
     table_name = 'ScrapedBlogPost'
+    current_date_time = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
     item = {
         'URL': {'S': url},
-        'Timestamp': {'S': datetime.now()},
-        'S3Path': {'S': s3_key},
+        'Timestamp': {'S': str(current_date_time)},
+        'S3Path': {'S': 'S3://scrapedurlresult/' + s3_key},
         'Title': {'S': bucket_file_name},
         'RecordCount': {'N': str(len(results))}
     }

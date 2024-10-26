@@ -114,19 +114,19 @@ aws lambda update-function-code   --function-name scraper-lambda   --image-uri 7
 
 {
     "FunctionName": "scraper-lambda",
-    "FunctionArn": "arn:aws:lambda:us-east-1:767398067034:function:scraper-lambda:3",
+    "FunctionArn": "arn:aws:lambda:us-east-1:767398067034:function:scraper-lambda:6",
     "Role": "arn:aws:iam::767398067034:role/lambda-ex",
     "CodeSize": 0,
     "Description": "",
-    "Timeout": 3,
+    "Timeout": 30,
     "MemorySize": 128,
-    "LastModified": "2024-10-25T12:56:55.000+0000",
-    "CodeSha256": "4b33cb9cd2308a86711c9b1f65bb0b71f4023aadf697490f8507a7702a9cd2ff",
-    "Version": "3",
+    "LastModified": "2024-10-26T15:18:07.000+0000",
+    "CodeSha256": "f87d3c4c5895ee558933765864778a31a25c8168837007a0563585de636465bf",
+    "Version": "6",
     "TracingConfig": {
         "Mode": "PassThrough"
     },
-    "RevisionId": "6804f06b-fdfb-444b-aa2e-3eb56654302f",
+    "RevisionId": "44cb1ba2-aa3e-4ad6-a82f-0906c1bdd801",
     "State": "Pending",
     "StateReason": "The function is being created.",
     "StateReasonCode": "Creating",
