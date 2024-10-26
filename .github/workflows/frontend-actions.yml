@@ -1,0 +1,36 @@
+name: URLScraper Actions
+run-name: ${{ github.actor }} updating frontend form to S3
+
+on: [push]
+env: 
+    BUCKET_NAME : "www.deeptechafrica.com"
+    AWS_REGION : "us-east-1"
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        permissions:
+            id-token: write
+            contents: read
+        steps:
+            - name: Git clone repo
+              uses: actions/checkout@v4
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                role-to-assume: arn:aws:iam::767398067034:role/toyeafo-actions-role
+                role-session-name: testrolesession
+                aws-region: ${{env.AWS_REGION}}
+            - name: Check AWS CLI version
+              run: aws --version
+            - name: Check AWS CLI Configuration
+              run: aws configure list
+            - name: "Debug: List files in URLScraper"
+              run: |
+                ls -R ./URLScraperForm/
+            - name: "Copy files to S3 bucket"
+              run: | 
+                aws s3 sync ./URLScraperForm/ s3://${{env.BUCKET_NAME}}/ --recursive --exclude ".git*" || echo "Error copying files to s3"
+            - name: "Debug: List files in s3 bucket"
+              run: |
+                aws s3 ls s3://${{env.BUCKET_NAME}}/
