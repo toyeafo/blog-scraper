@@ -6,12 +6,16 @@ document.addEventListener("DOMContentLoaded", function () {
         event.preventDefault(); // Prevent the form from refreshing the page
 
         const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
         const url = form.getAttribute("action") || "https://api.deeptechafrica.com/scraper";
 
         try {
             const response = await fetch(url, {
                 method: "POST",
-                body: new URLSearchParams(formData) // Converts FormData to URL-encoded format
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data) // Convert the data object to JSON
             });
 
             if (response.ok) {
