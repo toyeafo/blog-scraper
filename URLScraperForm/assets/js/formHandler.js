@@ -11,29 +11,38 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             const response = await fetch(url, {
                 method: "POST",
-                body: new URLSearchParams(formData), // Converts FormData to URL-encoded format
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded" // Needed for form submissions
-                }
+                body: new URLSearchParams(formData) // Converts FormData to URL-encoded format
             });
 
             if (response.ok) {
-                // Check if the response is HTML by attempting to parse it as text
                 const contentType = response.headers.get("Content-Type") || "";
                 const result = contentType.includes("text/html")
                     ? await response.text()
                     : (await response.json()).message || "Success!";
 
-                responseMessage.innerHTML = result;
+                // Ensure safe insertion of HTML content
+                if (contentType.includes("text/html")) {
+                    responseMessage.innerHTML = result;
+                } else {
+                    responseMessage.textContent = result;
+                }
+
                 responseMessage.classList.remove("text-danger");
                 responseMessage.classList.add("text-success");
             } else {
                 const contentType = response.headers.get("Content-Type") || "";
-                const error = contentType.includes("text/html")
-                    ? await response.text()
-                    : (await response.json()).message || "An error occurred.";
+                let error;
 
-                responseMessage.innerHTML = error;
+                // Try to parse JSON error message if available
+                try {
+                    error = contentType.includes("application/json")
+                        ? (await response.json()).message || "An error occurred."
+                        : await response.text();
+                } catch (jsonError) {
+                    error = "An error occurred.";
+                }
+
+                responseMessage.innerHTML = contentType.includes("text/html") ? error : document.createTextNode(error);
                 responseMessage.classList.remove("text-success");
                 responseMessage.classList.add("text-danger");
             }
