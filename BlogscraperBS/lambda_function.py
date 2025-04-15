@@ -48,6 +48,7 @@ def lambda_handler(event, context):
             'body': '<p>Error saving data to S3</p>'
         }
 
+    # Save bucket location to dynamodb
     try:
         save_bucket_loc_to_dynamodb(start_url, s3_key, results, bucket_file_name)
     except Exception as e:
@@ -60,12 +61,25 @@ def lambda_handler(event, context):
             'body': '<p>Error saving bucket location to Database</p>'
         }
     
+    try:
+        download_link = generate_presigned_url('scrapedurlresult', s3_key, results)
+    except Exception as e:
+        logger.error(f"Failed to generate bucket download link: {e}")
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Content-Type': 'text/html'
+            },
+            'body': '<p>Error retrieiving download link</p>'
+        }
+    
     return {
         'statusCode': 200,
         'headers': {
             'Content-Type': 'text/html'
         },
-        'body': f'<p>Submitted URL: {start_url} for scraping.</p>'
+        'body': f'<p>Submitted URL: {start_url} for scraping.</p>',
+        'download': f'{download_link}'
     }
 
 def save_bucket_loc_to_dynamodb(url, s3_key, results, bucket_file_name):
@@ -86,3 +100,15 @@ def save_bucket_loc_to_dynamodb(url, s3_key, results, bucket_file_name):
     except Exception as e:
         logger.error(f"Error saving bucket location to DynamoDB: {e}")
         raise
+
+def generate_presigned_url(bucket_name, object_key, expiration=3600):
+    try:
+        response = s3.generate_presigned_url('get_object',
+                                                    Params={'Bucket': bucket_name,
+                                                            'Key': object_key},
+                                                    ExpiresIn=expiration)
+    except Exception as e:
+        logger.error(f"Error generating pre-signed URL: {e}")
+        return None
+
+    return response
